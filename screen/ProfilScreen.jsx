@@ -1,12 +1,18 @@
 import { useState } from 'react';
 import { View, Text, Pressable, Modal, StyleSheet } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { useAuth } from '../context/AuthContext';
+import { usePanier } from '../context/PanierContext';
 
 // Écran Profil : affiche les informations de l'utilisateur connecté.
-// Props reçues depuis DrawerNavigator :
-//   - utilisateur : { id, nom, prenom, email } (renvoyé par verifierConnexion)
-//   - onDeconnexion : fonction qui remet utilisateur à null dans App.js
-export const ProfilScreen = ({ utilisateur, onDeconnexion }) => {
+// Aucune prop : tout vient des Contexts.
+//   - utilisateur : { id, nom, prenom, email } (AuthContext)
+//   - seDeconnecter : remet utilisateur à null (AuthContext)
+//   - vider : vide le panier (PanierContext)
+export const ProfilScreen = () => {
+  const { utilisateur, seDeconnecter } = useAuth();
+  const { vider } = usePanier();
+
   // true : la fenêtre modale est affichée, false : elle est cachée
   const [modalVisible, setModalVisible] = useState(false);
 
@@ -17,7 +23,8 @@ export const ProfilScreen = ({ utilisateur, onDeconnexion }) => {
 
   const confirmerDeconnexion = () => {
     setModalVisible(false);
-    onDeconnexion && onDeconnexion();
+    vider();          // le panier ne doit pas passer au prochain utilisateur
+    seDeconnecter();  // AuthContext : utilisateur = null, retour à la connexion
   };
 
   return (
@@ -48,15 +55,13 @@ export const ProfilScreen = ({ utilisateur, onDeconnexion }) => {
           </View>
         )}
 
-        {/* Le bouton ne déconnecte plus directement : il ouvre la modale */}
-        {onDeconnexion && (
-          <Pressable
-            onPress={() => setModalVisible(true)}
-            style={({ pressed }) => [styles.bouton, pressed && styles.boutonPresse]}
-          >
-            <Text style={styles.boutonTexte}>Se déconnecter</Text>
-          </Pressable>
-        )}
+        {/* Le bouton ne déconnecte pas directement : il ouvre la modale */}
+        <Pressable
+          onPress={() => setModalVisible(true)}
+          style={({ pressed }) => [styles.bouton, pressed && styles.boutonPresse]}
+        >
+          <Text style={styles.boutonTexte}>Se déconnecter</Text>
+        </Pressable>
       </View>
 
       {/* Fenêtre modale de confirmation */}

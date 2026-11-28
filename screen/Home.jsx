@@ -1,43 +1,13 @@
-import 'react-native-gesture-handler';
-import React, { useState, useEffect } from 'react';
-import { NavigationContainer } from '@react-navigation/native';
-import{ DrawerNavigator} from "../navigation/DrawerNavigator";
-import { SafeAreaProvider,SafeAreaView } from 'react-native-safe-area-context';
-import { StatusBar } from 'expo-status-bar';
-
-import { InscriptionScreen } from './InscriptionScreen';
 import { ProduitsScreen } from './produitsScreen';
-import { LoginScreen } from './LoginScreen';
+import { useAuth } from '../context/AuthContext';
 
-import { listerProduits } from '../database/produits';
-import { initDb } from '../database/schema';
-import { View, Text, Pressable } from 'react-native';
-import styles from "../AppStyles"
+export default function Home() {
+  const { utilisateur, seDeconnecter } = useAuth();
 
-
-
-function Home ({utilisateur,setUtilisateur}) {
-    
-    
-
-
-    
-  return(
-    <>
-      <SafeAreaProvider>
-        <StatusBar style="dark" />
-        <ProduitsScreen 
-          utilisateur={utilisateur}
-          onDeconnexion={() => setUtilisateur(null)}
-        />
-      
-      </SafeAreaProvider>
-     </>
-  )
-      
-
-    
-
+  return (
+    <ProduitsScreen
+      utilisateur={utilisateur}
+      onDeconnexion={seDeconnecter}
+    />
+  );
 }
-
-export default Home
